@@ -1,6 +1,6 @@
 # Architecture Overview
 
-<div class="mermaid">
+``` mermaid
 flowchart TD
     A[User Input] --> B[CLI: first_ai_call.py]
     B --> C[Router: route_request]
@@ -15,7 +15,7 @@ flowchart TD
     H --> I
     I --> J[Console Output]
     I --> K[interactions.log]
-</div>
+```
 
 ## Purpose
 
