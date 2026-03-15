@@ -1,3 +1,5 @@
+from src.ai.tool_definition import Tool
+
 def explain_kanban_metrics():
     return """
 Key Kanban flow metrics:
@@ -39,3 +41,9 @@ Common dependency types include:
 
 Managing dependencies well helps reduce delivery risk, improve coordination, and expose blockers early during PI execution.
 """
+
+kanban_metrics_tool = Tool(
+    name="kanban_metrics",
+    description="Explain key Kanban flow metrics such as lead time, cycle time, throughput, and WIP.",
+    func=explain_kanban_metrics,
+)
