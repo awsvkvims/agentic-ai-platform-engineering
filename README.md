@@ -36,6 +36,14 @@ The implementations in this repository use LangGraph-style agent workflows, emph
 
 ---
 
+## Architecture
+
+A high-level overview of the system architecture is available here:
+
+➡️ [Architecture Diagram and Explanation](docs/architecture.md)
+
+---
+
 ## Repository Goals
 
 This repository serves three purposes.
