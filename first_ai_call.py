@@ -1,8 +1,13 @@
 from src.ai.router import route_request
+from src.ai.tool_registry import list_tools
 
 user_input = input("Enter your prompt: ")
 
-source, response = route_request(user_input)
+if user_input.lower() == "list tools":
+    response = list_tools()
+    source = "local: tool_registry"
+else:
+    source, response = route_request(user_input)
 
 print(f"\nSource: {source}\n")
 print("Response:\n")

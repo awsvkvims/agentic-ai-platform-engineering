@@ -47,3 +47,15 @@ kanban_metrics_tool = Tool(
     description="Explain key Kanban flow metrics such as lead time, cycle time, throughput, and WIP.",
     func=explain_kanban_metrics,
 )
+
+platform_engineering_tool = Tool(
+    name="platform_engineering",
+    description="Explain platform engineering and internal developer platforms.",
+    func=explain_platform_engineering,
+)
+
+pi_planning_dependencies_tool = Tool(
+    name="pi_planning_dependencies",
+    description="Explain SAFe PI Planning dependencies and why they matter.",
+    func=explain_pi_planning_dependencies,
+)
