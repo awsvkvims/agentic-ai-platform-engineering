@@ -2,19 +2,16 @@
 
 ``` mermaid
 flowchart TD
-    A[User Input] --> B[CLI: first_ai_call.py]
-    B --> C[Router: route_request]
-    C -->|Kanban terms| D[Tool: explain_kanban_metrics]
-    C -->|Platform terms| E[Tool: explain_platform_engineering]
-    C -->|PI dependency terms| F[Tool: explain_pi_planning_dependencies]
-    C -->|No tool match| G[Model Client: ask_model]
-    G --> H[OpenAI API]
-    D --> I[Response]
-    E --> I
-    F --> I
-    H --> I
-    I --> J[Console Output]
-    I --> K[interactions.log]
+    A[User Input] --> B[CLI]
+    B --> C[Router]
+    C --> D[Tool Registry]
+    D --> E[Tool Execution]
+    C --> F[Model Client]
+    F --> G[OpenAI API]
+    E --> H[Response]
+    G --> H
+    H --> I[Console Output]
+    H --> J[Interaction Log]
 ```
 
 ## Purpose
