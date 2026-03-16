@@ -3,15 +3,16 @@
 ``` mermaid
 flowchart TD
     A[User Input] --> B[CLI]
-    B --> C[Router]
-    C --> D[Tool Registry]
-    D --> E[Tool Execution]
-    C --> F[Model Client]
-    F --> G[OpenAI API]
-    E --> H[Response]
-    G --> H
-    H --> I[Console Output]
-    H --> J[Interaction Log]
+    B --> C[Tool Selector LLM]
+    C -->|JSON tool choice| D[Router]
+    D -->|tool| E[Tool Registry]
+    D -->|fallback| F[LLM Response]
+    E --> G[Tool Execution]
+    F --> H[Model Output]
+    G --> I[Response]
+    H --> I
+    I --> J[Console Output]
+    I --> K[Interaction Log]
 ```
 
 ## Purpose
