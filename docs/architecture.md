@@ -31,14 +31,20 @@ The current implementation is intentionally simple:
 
 ## Current Architecture
 
-The current flow is:
+The system now follows a simple agent-style workflow.
 
-1. The user enters a prompt in the command line
-2. The CLI passes that input to the router
-3. The router checks whether the request matches a known tool path
-4. If a tool matches, the tool returns a deterministic response
-5. If no tool matches, the model client sends the prompt to the OpenAI API
-6. The chosen response is displayed and saved to the log
+1. The user enters a prompt in the CLI.
+2. The tool selector (an LLM call) analyzes the request and chooses a tool or returns `none`.
+3. The router receives the selected tool name.
+4. If a tool is selected:
+   - the router finds the tool in the tool registry
+   - the tool executes and returns deterministic output
+   - the model synthesizes a final answer using the tool result
+5. If no tool is selected:
+   - the router sends the prompt directly to the model
+6. The final response is displayed to the user and logged.
+
+This creates a simple **reason --> act --> observe --> respond** loop.
 
 ## Components
 
