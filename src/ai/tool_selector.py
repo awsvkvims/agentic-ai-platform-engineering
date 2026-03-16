@@ -1,38 +1,22 @@
 import json
 from src.ai.client import ask_model
 from src.ai.tool_registry import TOOLS, get_tool_descriptions
+from src.ai.prompt_loader import load_prompt
 
 
 def choose_tool(user_input: str) -> tuple[str, str, str]:
     tool_descriptions = get_tool_descriptions()
+
     valid_tool_names = [tool.name for tool in TOOLS]
-    valid_tool_names_text = "\n".join(f"- {name}" for name in valid_tool_names)
+    valid_tool_names_text = "\n".join(valid_tool_names)
 
-    prompt = f"""
-You are a tool selector.
+    template = load_prompt("tool_selector.txt")
 
-Available tools:
-{tool_descriptions}
-
-User request:
-{user_input}
-
-Choose a tool only if it is a strong match for the user's request.
-If none of the tools is a strong match, return none.
-
-Respond ONLY in JSON like this:
-
-{{"tool": "tool_name", "reason": "short reason", "confidence": "high"}}
-
-Valid tool names:
-{valid_tool_names_text}
-- none
-
-Valid confidence values:
-- high
-- medium
-- low
-"""
+    prompt = template.format(
+        tool_descriptions=tool_descriptions,
+        user_input=user_input,
+        valid_tool_names=valid_tool_names_text,
+    )
 
     response = ask_model(prompt)
 
@@ -49,5 +33,6 @@ Valid confidence values:
             return selected_tool, reason, confidence
 
         return "none", "Model returned an invalid tool name.", "low"
+
     except Exception:
         return "none", "Model did not return valid JSON.", "low"

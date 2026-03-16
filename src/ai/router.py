@@ -1,6 +1,7 @@
 from src.ai.client import ask_model
 from src.ai.tool_registry import TOOLS
 from src.ai.tool_selector import choose_tool
+from src.ai.prompt_loader import load_prompt
 
 
 def route_request(user_input: str) -> tuple[str, str, str, str, str]:
@@ -15,25 +16,11 @@ def route_request(user_input: str) -> tuple[str, str, str, str, str]:
                 else:
                     tool_result = tool.func()
 
-                synthesis_prompt = f"""
-You are an assistant helping with Agile delivery, DevOps enablement, and platform engineering.
-
-User question:
-{user_input}
-
-Tool result:
-{tool_result}
-
-Write a final answer for the user based directly on the tool result.
-
-Requirements:
-- Use the specific counts from the tool result
-- Mention specific backlog items when relevant
-- Do not give only generic advice
-- Summarize the main risks found in this backlog
-- End with a short list of practical actions
-- Do not mention that a tool was used
-"""
+                template = load_prompt("synthesis.txt")
+                synthesis_prompt = template.format(
+                    user_input=user_input,
+                    tool_result=tool_result,
+                )
 
                 final_answer = ask_model(synthesis_prompt)
                 source = f"tool: {tool.name}"
