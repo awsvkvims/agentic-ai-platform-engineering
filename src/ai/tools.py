@@ -55,6 +55,25 @@ Common warning signs include:
 A useful first response is to split large items, clarify priorities, reduce WIP, and make dependencies visible early.
 """
 
+def analyze_backlog_items():
+    return """
+Backlog risk analysis checklist:
+
+Look for:
+- items that are too large to complete within a sprint
+- unclear acceptance criteria
+- dependencies across teams
+- many items marked blocked
+- too many items in progress simultaneously
+
+Recommended actions:
+- split large items
+- clarify acceptance criteria
+- visualize dependencies
+- reduce WIP
+- ensure backlog prioritization is clear
+"""
+
 
 
 
@@ -80,4 +99,10 @@ backlog_risk_tool = Tool(
     name="backlog_risk",
     description="Use this when the user asks about backlog risk, delivery risk in a backlog, blocked backlog items, or signs that a backlog may be unhealthy.",
     func=summarize_backlog_risk,
+)
+
+backlog_analysis_tool = Tool(
+    name="backlog_analysis",
+    description="Use this when the user asks about analyzing backlog items, backlog health, or delivery risks in backlog work.",
+    func=analyze_backlog_items,
 )

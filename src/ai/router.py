@@ -3,10 +3,10 @@ from src.ai.tool_registry import TOOLS
 from src.ai.tool_selector import choose_tool
 
 
-def route_request(user_input: str) -> tuple[str, str, str]:
-    tool_name, reason = choose_tool(user_input)
+def route_request(user_input: str) -> tuple[str, str, str, str, str]:
+    tool_name, reason, confidence = choose_tool(user_input)
 
-    if tool_name != "none":
+    if tool_name != "none" and confidence == "high":
         for tool in TOOLS:
             if tool.name == tool_name:
                 tool_result = tool.func()
@@ -25,8 +25,9 @@ Do not mention that a tool was used.
 """
 
                 final_answer = ask_model(synthesis_prompt)
-
-                return f"tool: {tool.name} | reason: {reason}", tool_result, final_answer
+                source = f"tool: {tool.name}"
+                return source, reason, confidence, tool_result, final_answer
 
     final_answer = ask_model(user_input)
-    return f"model: openai | reason: {reason}", "", final_answer
+    source = "model: openai"
+    return source, reason, confidence, "", final_answer

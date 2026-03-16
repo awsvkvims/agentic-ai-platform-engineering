@@ -3,6 +3,7 @@ from src.ai.tools import (
     platform_engineering_tool,
     pi_planning_dependencies_tool,
     backlog_risk_tool,
+    backlog_analysis_tool,
 )
 
 TOOLS = [
@@ -10,6 +11,7 @@ TOOLS = [
     platform_engineering_tool,
     pi_planning_dependencies_tool,
     backlog_risk_tool,
+    backlog_analysis_tool,
 ]
 
 
