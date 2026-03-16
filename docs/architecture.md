@@ -4,45 +4,96 @@ This document describes the architecture of the agent system implemented in this
 
 The system demonstrates a minimal but practical agent workflow that combines model reasoning with deterministic tool execution.
 
+The current implementation uses LangGraph to orchestrate the execution flow.
+
 ---
 
-# High Level architecture
-
-``` mermaid
-
+# High Level Architecture
+```mermaid
 flowchart TD
 
 UserInput["User Input"] --> CLI["CLI Interface"]
 
-CLI --> ToolSelector["Tool Selector LLM"]
+CLI --> LangGraph["LangGraph Agent"]
 
-ToolSelector --> Decision["JSON Tool Decision"]
+LangGraph --> Selector["Tool Selector LLM"]
 
-Decision --> Router["Router"]
+Selector --> Decision["JSON Tool Decision"]
 
-Router --> ToolRegistry["Tool Registry"]
+Decision --> ToolExecution["Tool Execution"]
 
-ToolRegistry --> ToolExecution["Tool Execution"]
+Decision --> ModelFallback["Direct Model Call"]
 
 ToolExecution --> ToolResult["Tool Result"]
 
-Router --> ModelFallback["Direct Model Call"]
-
 ToolResult --> Synthesis["Response Synthesis LLM"]
 
-Synthesis --> FinalResponse["Final Response"]
+ModelFallback --> FinalResponse["Final Response"]
 
-ModelFallback --> FinalResponse
+Synthesis --> FinalResponse
 
 FinalResponse --> ConsoleOutput["Console Output"]
 
 FinalResponse --> Logs["Interaction Log"]
 
 Decision --> Logs
-
 ToolResult --> Logs
+```
+
+This diagram shows the overall system architecture.
+
+User requests enter through the CLI.
+The CLI invokes the LangGraph agent which orchestrates reasoning and tool execution.
+
+The agent may either execute a tool or fall back to a direct model response.
+
+---
+
+# LangGraph Execution Workflow
+
+``` mermaid
+
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD
+
+__start__ --> select_tool
+
+select_tool -->|use_tool| run_tool
+select_tool -->|fallback| fallback_model
+
+run_tool --> synthesize
+
+synthesize --> __end__
+fallback_model --> __end__
 
 ```
+
+Nodes in the graph:
+
+**select_tool**
+- Uses an LLM to determine whether a tool should be used.
+
+**run_tool**
+- Executes a deterministic Python tool.
+
+**synthesize**
+- Uses the LLM to convert tool output into a user friendly response.
+
+**fallback_model**
+- Directly queries the model when no tool is appropriate.
+
+This creates a simple agent reasoning loop:
+
+``` mermaid
+flowchart LR
+    reason --> act --> observe --> respond
+```
+
+The graph structure allows additional nodes to be added easily as the system evolves.
 
 ---
 
@@ -59,6 +110,23 @@ Examples include:
 - show tool descriptions
 - analyze backlog
 
+The CLI invokes the LangGraph agent to process requests.
+
+---
+
+## LangGraph Agent
+
+LangGraph orchestrates the agent execution workflow.
+
+The graph manages:
+
+- tool selection
+- conditional branching
+- tool execution
+- response synthesis
+
+Using a graph structure makes the workflow easier to extend and reason about.
+
 ---
 
 ## Tool Selector
@@ -71,37 +139,29 @@ It returns structured JSON containing:
 - reason
 - confidence
 
-This allows the system to reason about tool usage rather than relying on hard coded rules.
+Example response structure:
 
----
+{
+"tool": "kanban_metrics",
+"reason": "The user asked about lead time which is a Kanban flow metric",
+"confidence": "high"
+}
 
-## Router
-
-The router is responsible for executing the selected action.
-
-If a tool is selected with high confidence:
-
-- the router locates the tool in the tool registry
-- the tool is executed
-- the result is sent to the synthesis prompt
-
-If no tool is selected:
-
-- the request is sent directly to the model.
+This structured output allows deterministic routing decisions.
 
 ---
 
 ## Tool Registry
 
-The tool registry stores structured definitions of all available tools.
+The tool registry stores structured definitions of available tools.
 
-Each tool contains:
+Each tool includes:
 
 - name
 - description
 - function
 
-This allows the selector to reason about available tools.
+This allows the selector to reason about available capabilities.
 
 ---
 
@@ -109,7 +169,7 @@ This allows the selector to reason about available tools.
 
 Tools are deterministic Python functions that provide domain specific capabilities.
 
-Examples include:
+Current examples include:
 
 - Kanban metric explanations
 - backlog risk analysis
@@ -130,11 +190,11 @@ Examples:
 - prompts/tool_selector.txt
 - prompts/synthesis.txt
 
-This allows prompts to be updated independently of application logic.
+Separating prompts from code allows them to evolve independently.
 
 ---
 
-## Logging and Observability
+# Logging and Observability
 
 Each interaction records:
 
@@ -155,9 +215,13 @@ The architecture will evolve in later stages of the project.
 
 Planned improvements include:
 
-- LangGraph orchestration replacing the router
-- DevOps oriented tools for Terraform and CI/CD analysis
-- Platform engineering assistants for developer onboarding
-- Governance agents for compliance and FinOps
+DevOps oriented tools for Terraform and CI/CD analysis
 
-These changes will extend the current architecture while preserving the same core agent pattern.
+Platform engineering assistants for developer onboarding
+
+Compliance and FinOps analysis agents
+
+Human in the loop approval steps for automated changes
+
+These improvements will extend the LangGraph workflow while preserving the same core agent architecture.
+

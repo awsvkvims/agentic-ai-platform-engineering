@@ -98,4 +98,7 @@ def run_langgraph_agent(user_input: str) -> tuple[str, str, str, str, str]:
         result["tool_result"],
         result["final_answer"],
     )
+    
+def get_graph():
+    return agent_graph
 
