@@ -2,17 +2,21 @@
 
 ``` mermaid
 flowchart TD
-    A[User Input] --> B[CLI]
+    A[User Input] --> B[CLI: first_ai_call.py]
     B --> C[Tool Selector LLM]
-    C -->|JSON tool choice| D[Router]
-    D -->|tool| E[Tool Registry]
-    D -->|fallback| F[LLM Response]
-    E --> G[Tool Execution]
-    F --> H[Model Output]
-    G --> I[Response]
-    H --> I
-    I --> J[Console Output]
-    I --> K[Interaction Log]
+    C --> D[JSON Tool Choice + Reason]
+    D --> E[Router]
+    E --> F[Tool Registry]
+    F --> G[Selected Tool]
+    G --> H[Tool Result]
+    E -->|none| I[Direct Model Call]
+    H --> J[Synthesis LLM]
+    J --> K[Final Response]
+    I --> K
+    K --> L[Console Output]
+    K --> M[interactions.log]
+    H --> M
+    D --> M
 ```
 
 ## Purpose
