@@ -1,4 +1,4 @@
-from src.ai.router import route_request
+from src.ai.langgraph_agent import run_langgraph_agent
 from src.ai.tool_registry import list_tools, get_tool_descriptions
 
 user_input = input("Enter your prompt: ")
@@ -41,7 +41,7 @@ elif user_input.lower() == "analyze backlog":
         tool_result = f.read()
     response = tool_result
 else:
-    source, reason, confidence, tool_result, response = route_request(user_input)
+    source, reason, confidence, tool_result, response = run_langgraph_agent(user_input)
 
 print(f"\nSource: {source}")
 if confidence:
