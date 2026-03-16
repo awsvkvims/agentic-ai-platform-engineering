@@ -17,6 +17,9 @@ Available tools:
 User request:
 {user_input}
 
+Choose a tool only if it is a strong match for the user's request.
+If none of the tools is a strong match, return none.
+
 Respond ONLY in JSON like this:
 
 {{"tool": "tool_name", "reason": "short reason"}}
@@ -39,4 +42,3 @@ Valid tool names:
         return "none", "Model returned an invalid tool name."
     except Exception:
         return "none", "Model did not return valid JSON."
-    

@@ -2,12 +2,14 @@ from src.ai.tools import (
     kanban_metrics_tool,
     platform_engineering_tool,
     pi_planning_dependencies_tool,
+    backlog_risk_tool,
 )
 
 TOOLS = [
     kanban_metrics_tool,
     platform_engineering_tool,
     pi_planning_dependencies_tool,
+    backlog_risk_tool,
 ]
 
 

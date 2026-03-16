@@ -41,6 +41,22 @@ Common dependency types include:
 
 Managing dependencies well helps reduce delivery risk, improve coordination, and expose blockers early during PI execution.
 """
+def summarize_backlog_risk():
+    return """
+A backlog may show delivery risk when it contains too many large items, unclear priorities, unresolved dependencies, blocked work, or too much work in progress at the same time.
+
+Common warning signs include:
+- oversized stories or features
+- many items marked blocked
+- dependencies across teams
+- weak acceptance criteria
+- high WIP and low throughput
+
+A useful first response is to split large items, clarify priorities, reduce WIP, and make dependencies visible early.
+"""
+
+
+
 
 kanban_metrics_tool = Tool(
     name="kanban_metrics",
@@ -58,4 +74,10 @@ pi_planning_dependencies_tool = Tool(
     name="pi_planning_dependencies",
     description="Explain SAFe PI Planning dependencies and why they matter.",
     func=explain_pi_planning_dependencies,
+)
+
+backlog_risk_tool = Tool(
+    name="backlog_risk",
+    description="Use this when the user asks about backlog risk, delivery risk in a backlog, blocked backlog items, or signs that a backlog may be unhealthy.",
+    func=summarize_backlog_risk,
 )

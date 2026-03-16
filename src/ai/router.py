@@ -3,7 +3,7 @@ from src.ai.tool_registry import TOOLS
 from src.ai.tool_selector import choose_tool
 
 
-def route_request(user_input: str) -> tuple[str, str]:
+def route_request(user_input: str) -> tuple[str, str, str]:
     tool_name, reason = choose_tool(user_input)
 
     if tool_name != "none":
@@ -26,6 +26,7 @@ Do not mention that a tool was used.
 
                 final_answer = ask_model(synthesis_prompt)
 
-                return f"tool: {tool.name} | reason: {reason}", final_answer
+                return f"tool: {tool.name} | reason: {reason}", tool_result, final_answer
 
-    return f"model: openai | reason: {reason}", ask_model(user_input)
+    final_answer = ask_model(user_input)
+    return f"model: openai | reason: {reason}", "", final_answer
