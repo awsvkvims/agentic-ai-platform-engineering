@@ -9,6 +9,23 @@ def route_request(user_input: str) -> tuple[str, str]:
     if tool_name != "none":
         for tool in TOOLS:
             if tool.name == tool_name:
-                return f"tool: {tool.name} | reason: {reason}", tool.func()
+                tool_result = tool.func()
+
+                synthesis_prompt = f"""
+You are an assistant helping with Agile delivery, DevOps enablement, and platform engineering.
+
+User question:
+{user_input}
+
+Tool result:
+{tool_result}
+
+Use the tool result to produce a helpful final answer for the user.
+Do not mention that a tool was used.
+"""
+
+                final_answer = ask_model(synthesis_prompt)
+
+                return f"tool: {tool.name} | reason: {reason}", final_answer
 
     return f"model: openai | reason: {reason}", ask_model(user_input)
