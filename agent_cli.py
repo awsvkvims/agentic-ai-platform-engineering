@@ -37,7 +37,21 @@ elif user_input.lower() == "analyze backlog":
     source = "local: backlog_file"
     reason = ""
     confidence = ""
-    with open("sample_backlog.txt", "r") as f:
+    with open("samples/backlog/sample_backlog.txt", "r") as f:
+        tool_result = f.read()
+    response = tool_result
+elif user_input.lower() == "analyze terraform":
+    source = "local: terraform_file"
+    reason = ""
+    confidence = ""
+    with open("samples/terraform/sample_terraform.tf", "r") as f:
+        tool_result = f.read()
+    response = tool_result
+elif user_input.lower() == "analyze pipeline":
+    source = "local: pipeline_file"
+    reason = ""
+    confidence = ""
+    with open("samples/pipeline/sample_pipeline.yml", "r") as f:
         tool_result = f.read()
     response = tool_result
 else:
@@ -51,7 +65,7 @@ if reason:
 print("\nResponse:\n")
 print(response)
 
-with open("interactions.log", "a") as f:
+with open("logs/interactions.log", "a") as f:
     f.write("USER INPUT:\n")
     f.write(user_input + "\n\n")
     f.write("SOURCE:\n")

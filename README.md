@@ -34,22 +34,25 @@ The current implementation uses LangGraph to orchestrate a small agent workflow 
 
 # Current Capabilities
 
-The current implementation demonstrates a minimal agent architecture that can:
+The current implementation demonstrates a LangGraph-based agent workflow that can:
 
 - select tools using an LLM
-- reason about when tools should be used
 - execute deterministic tools
 - synthesize responses from tool results
-- analyze backlog risk using real backlog data
+- analyze backlog data
+- analyze Terraform configuration risks
+- review CI/CD pipeline risks
 - provide CLI interaction with observable reasoning
 
-Example capabilities include:
+Current examples include:
 
 - Kanban metric explanations
 - backlog risk detection
 - backlog analysis using sample backlog data
 - platform engineering explanations
 - PI planning dependency explanations
+- Terraform risk analysis
+- CI/CD pipeline review
 
 The system logs the reasoning path including:
 
@@ -58,7 +61,21 @@ The system logs the reasoning path including:
 - reasoning explanation
 - tool output
 
-This makes the system easier to inspect and debug.
+Logs are written to:
+
+`logs/interactions.log`
+
+---
+
+# Sample Inputs
+
+Sample inputs used by the agent are stored under:
+
+- `samples/backlog/sample_backlog.txt`
+- `samples/terraform/sample_terraform.tf`
+- `samples/pipeline/sample_pipeline.yml`
+
+These sample files make it easy to demonstrate the tools without needing external systems.
 
 ---
 
@@ -99,9 +116,9 @@ Create and activate a virtual environment
 
 Install dependencies
 
-    pip install openai python-dotenv pytest
+    pip install openai python-dotenv pytest langgraph langchain-core
 
-Create a .env file in the project root
+Create a `.env` file in the project root
 
     OPENAI_API_KEY=your_api_key_here
 
@@ -115,10 +132,12 @@ Run the CLI
 
 Inside the CLI you can run the following commands.
 
-- help
-- list tools
-- show tool descriptions
-- analyze backlog
+- `help`
+- `list tools`
+- `show tool descriptions`
+- `analyze backlog`
+- `analyze terraform`
+- `analyze pipeline`
 
 ---
 
@@ -126,11 +145,13 @@ Inside the CLI you can run the following commands.
 
 Examples of questions you can ask the agent.
 
-- What is lead time?
-- What are signs that a backlog may have delivery risk?
-- How should I analyze backlog items for delivery risk?
-- What is an internal developer platform?
-- Explain PI planning dependencies.
+- `What is lead time?`
+- `What are signs that a backlog may have delivery risk?`
+- `How should I analyze backlog items for delivery risk?`
+- `What is an internal developer platform?`
+- `Explain PI planning dependencies.`
+- `Analyze this Terraform for security and best practice risks`
+- `Review this CI/CD pipeline for delivery risks`
 
 ---
 
@@ -165,15 +186,20 @@ This repository serves three purposes.
 
 The repository evolves incrementally.
 
-- **Increment 1**: Foundational agent architecture and tool system.
+### Increment 1  
+Foundational agent architecture and tool system.
 
-- **Increment 2**: Model driven tool selection and backlog analysis agents.
+### Increment 2  
+Model-driven tool selection, response synthesis, and backlog analysis.
 
-- **Increment 3**: LangGraph based orchestration and DevOps oriented agents.
+### Increment 3  
+LangGraph-based orchestration plus DevOps-oriented tools for Terraform and CI/CD analysis.
 
-- **Increment 4**: Platform engineering assistants inspired by Backstage workflows.
+### Increment 4  
+Platform engineering assistants inspired by Backstage workflows.
 
-- **Increment 5**: Compliance and FinOps governance agents.
+### Increment 5  
+Compliance and FinOps governance agents.
 
 ---
 

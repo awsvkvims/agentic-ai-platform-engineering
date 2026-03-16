@@ -12,7 +12,13 @@ def run_tool_step(tool_name):
     for tool in TOOLS:
         if tool.name == tool_name:
             if tool.name == "backlog_analysis":
-                with open("sample_backlog.txt", "r") as f:
+                with open("samples/backlog/sample_backlog.txt", "r") as f:
+                    return tool.func(f.read())
+            elif tool.name == "terraform_analyzer":
+                with open("samples/terraform/sample_terraform.tf", "r") as f:
+                    return tool.func(f.read())
+            elif tool.name == "cicd_pipeline_reviewer":
+                with open("samples/pipeline/sample_pipeline.yml", "r") as f:
                     return tool.func(f.read())
             return tool.func()
     return ""
