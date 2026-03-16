@@ -1,156 +1,163 @@
 # Architecture Overview
 
+This document describes the architecture of the agent system implemented in this repository.
+
+The system demonstrates a minimal but practical agent workflow that combines model reasoning with deterministic tool execution.
+
+---
+
+# High Level architecture
+
 ``` mermaid
+
 flowchart TD
-    A[User Input] --> B[CLI: client_cli.py]
-    B --> C[Tool Selector LLM]
-    C --> D[JSON Tool Choice + Reason]
-    D --> E[Router]
-    E --> F[Tool Registry]
-    F --> G[Selected Tool]
-    G --> H[Tool Result]
-    E -->|none| I[Direct Model Call]
-    H --> J[Synthesis LLM]
-    J --> K[Final Response]
-    I --> K
-    K --> L[Console Output]
-    K --> M[interactions.log]
-    H --> M
-    D --> M
+
+UserInput["User Input"] --> CLI["CLI Interface"]
+
+CLI --> ToolSelector["Tool Selector LLM"]
+
+ToolSelector --> Decision["JSON Tool Decision"]
+
+Decision --> Router["Router"]
+
+Router --> ToolRegistry["Tool Registry"]
+
+ToolRegistry --> ToolExecution["Tool Execution"]
+
+ToolExecution --> ToolResult["Tool Result"]
+
+Router --> ModelFallback["Direct Model Call"]
+
+ToolResult --> Synthesis["Response Synthesis LLM"]
+
+Synthesis --> FinalResponse["Final Response"]
+
+ModelFallback --> FinalResponse
+
+FinalResponse --> ConsoleOutput["Console Output"]
+
+FinalResponse --> Logs["Interaction Log"]
+
+Decision --> Logs
+
+ToolResult --> Logs
+
 ```
 
-## Purpose
+---
 
-This project explores small, understandable patterns for building agentic AI systems for Agile delivery, DevOps enablement, and platform engineering workflows.
+# Core Components
 
-The current implementation is intentionally simple:
-- a command-line interface accepts user input
-- a router decides how to handle the request
-- the system either calls a local tool or the language model
-- the response is shown to the user and logged
+## CLI
 
-## Current Architecture
+The CLI provides a simple interactive interface where users can enter prompts and commands.
 
-The system now follows a simple agent-style workflow.
+Examples include:
 
-1. The user enters a prompt in the CLI.
-2. The tool selector (an LLM call) analyzes the request and chooses a tool or returns `none`.
-3. The router receives the selected tool name.
-4. If a tool is selected:
-   - the router finds the tool in the tool registry
-   - the tool executes and returns deterministic output
-   - the model synthesizes a final answer using the tool result
-5. If no tool is selected:
-   - the router sends the prompt directly to the model
-6. The final response is displayed to the user and logged.
+- help
+- list tools
+- show tool descriptions
+- analyze backlog
 
-This creates a simple **reason --> act --> observe --> respond** loop.
+---
 
-## Components
+## Tool Selector
 
-### CLI
-**File:** `client_cli.py`
+The tool selector uses an LLM to determine whether a request should be handled by a tool.
 
-This is the entry point for the project. It:
-- collects user input
-- calls the router
-- prints the chosen source and response
-- writes the interaction to `interactions.log`
+It returns structured JSON containing:
 
-### Router
-**File:** `src/ai/router.py`
+- tool
+- reason
+- confidence
 
-The router contains the decision logic. It examines the input text and determines whether to:
-- call a local tool
-- or fall back to the language model
+This allows the system to reason about tool usage rather than relying on hard coded rules.
 
-This is the first agent-like behavior in the project.
+---
 
-### Tools
-**File:** `src/ai/tools.py`
+## Router
 
-The tools module contains local deterministic functions for specific domain topics:
-- Kanban metrics
-- platform engineering
-- PI planning dependencies
+The router is responsible for executing the selected action.
 
-These tools are useful because they are:
-- fast
-- predictable
-- easy to test
+If a tool is selected with high confidence:
 
-### Model Client
-**File:** `src/ai/client.py`
+- the router locates the tool in the tool registry
+- the tool is executed
+- the result is sent to the synthesis prompt
 
-The model client is responsible for communicating with the OpenAI API. It:
-- loads the API key from `.env`
-- applies the configured model name
-- sends prompts to the model
-- returns the model response text
+If no tool is selected:
 
-### Config
-**File:** `src/ai/config.py`
+- the request is sent directly to the model.
 
-The config module stores settings that may change over time, such as:
-- model name
-- default system role
+---
 
-This keeps configuration separate from logic.
+## Tool Registry
 
-### Tests
-**File:** `tests/test_router.py`
+The tool registry stores structured definitions of all available tools.
 
-The test file verifies that known requests are routed correctly. This is the beginning of an engineering discipline around reliability and maintainability.
+Each tool contains:
 
-## Design Principles
+- name
+- description
+- function
 
-The current system follows a few simple design principles:
+This allows the selector to reason about available tools.
 
-### Separation of concerns
-Each module has one clear responsibility:
-- CLI for interaction
-- router for decision-making
-- tools for deterministic knowledge
-- client for model access
-- config for settings
+---
 
-### Deterministic where possible
-If a request can be answered reliably by a local tool, the system uses that path instead of calling the model.
+## Tools
 
-### Model as fallback
-The language model is used when the request does not match a known local tool.
+Tools are deterministic Python functions that provide domain specific capabilities.
 
-### Observability
-The system shows which source was used and logs interactions for later review.
+Examples include:
 
-## Current Limitations
+- Kanban metric explanations
+- backlog risk analysis
+- backlog analysis using structured backlog data
+- platform engineering explanations
+- PI planning dependency explanations
 
-This project is still intentionally small. Current limitations include:
-- routing is keyword-based
-- tools are static functions
-- there is no memory across interactions
-- there is no structured state object
-- there is no multi-step workflow or graph orchestration yet
+Tools allow the agent to access structured knowledge rather than relying only on LLM responses.
 
-## Next Evolution
+---
 
-A natural next step is to evolve this design toward a more structured agent workflow by adding:
-- structured tool metadata
-- explicit state handling
-- richer routing rules
-- multiple decision steps
-- graph-based orchestration similar to LangGraph
+## Prompt Layer
 
-## Summary
+Prompts are stored separately from code in the prompts directory.
 
-This architecture is a beginner-friendly foundation for learning agentic AI in a practical platform engineering context.
+Examples:
 
-It already demonstrates:
-- routing
-- tool usage
-- model fallback
-- configuration
-- logging
-- basic testing
+- prompts/tool_selector.txt
+- prompts/synthesis.txt
 
-The goal is to grow this foundation incrementally into a more capable agent workflow system.
+This allows prompts to be updated independently of application logic.
+
+---
+
+## Logging and Observability
+
+Each interaction records:
+
+- user input
+- selected tool
+- confidence level
+- reason for selection
+- tool output
+- final response
+
+This provides transparency into how the agent made decisions.
+
+---
+
+# Future Evolution
+
+The architecture will evolve in later stages of the project.
+
+Planned improvements include:
+
+- LangGraph orchestration replacing the router
+- DevOps oriented tools for Terraform and CI/CD analysis
+- Platform engineering assistants for developer onboarding
+- Governance agents for compliance and FinOps
+
+These changes will extend the current architecture while preserving the same core agent pattern.
