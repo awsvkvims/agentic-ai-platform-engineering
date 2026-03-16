@@ -3,7 +3,25 @@ from src.ai.tool_registry import list_tools, get_tool_descriptions
 
 user_input = input("Enter your prompt: ")
 
-if user_input.lower() == "list tools":
+if user_input.lower() == "help":
+    source = "local: help"
+    reason = ""
+    confidence = ""
+    tool_result = ""
+    response = """Available commands:
+- help
+- list tools
+- show tool descriptions
+- analyze backlog
+
+Or ask a normal question, such as:
+- What is lead time?
+- What are signs that a backlog may have delivery risk?
+- How should I analyze backlog items for delivery risk?
+- What is an internal developer platform?
+"""
+
+elif user_input.lower() == "list tools":
     source = "local: tool_registry"
     reason = ""
     confidence = ""
@@ -15,6 +33,13 @@ elif user_input.lower() == "show tool descriptions":
     confidence = ""
     tool_result = ""
     response = get_tool_descriptions()
+elif user_input.lower() == "analyze backlog":
+    source = "local: backlog_file"
+    reason = ""
+    confidence = ""
+    with open("sample_backlog.txt", "r") as f:
+        tool_result = f.read()
+    response = tool_result
 else:
     source, reason, confidence, tool_result, response = route_request(user_input)
 
