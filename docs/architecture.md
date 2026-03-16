@@ -2,7 +2,7 @@
 
 ``` mermaid
 flowchart TD
-    A[User Input] --> B[CLI: first_ai_call.py]
+    A[User Input] --> B[CLI: client_cli.py]
     B --> C[Tool Selector LLM]
     C --> D[JSON Tool Choice + Reason]
     D --> E[Router]
@@ -49,7 +49,7 @@ This creates a simple **reason --> act --> observe --> respond** loop.
 ## Components
 
 ### CLI
-**File:** `first_ai_call.py`
+**File:** `client_cli.py`
 
 This is the entry point for the project. It:
 - collects user input
