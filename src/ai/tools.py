@@ -50,7 +50,7 @@ kanban_metrics_tool = Tool(
 
 platform_engineering_tool = Tool(
     name="platform_engineering",
-    description="Explain platform engineering and internal developer platforms.",
+    description="Use this only when the user is asking for a definition or explanation of platform engineering or internal developer platforms. Do not use it for Terraform generation, CI/CD generation, or implementation tasks.",
     func=explain_platform_engineering,
 )
 
