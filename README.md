@@ -28,6 +28,8 @@ Examples explored in this repository include:
 - detecting delivery risks in backlog items
 - preparing the foundation for DevOps and platform agents
 
+The current implementation uses LangGraph to orchestrate a small agent workflow with tool selection, tool execution, and response synthesis.
+
 ---
 
 # Current Capabilities
@@ -167,7 +169,7 @@ The repository evolves incrementally.
 
 - **Increment 2**: Model driven tool selection and backlog analysis agents.
 
-- **Increment 3**: LangGraph integration and DevOps oriented agents.
+- **Increment 3**: LangGraph based orchestration and DevOps oriented agents.
 
 - **Increment 4**: Platform engineering assistants inspired by Backstage workflows.
 
