@@ -1,0 +1,7 @@
+1. Story: Build login page - In Progress
+2. Story: Create Terraform module for S3 bucket - Blocked due to security review
+3. Feature: Developer portal integration - Too large, spans multiple teams
+4. Story: Add CI pipeline for service A - In Progress
+5. Bug: Fix deployment rollback issue - Blocked due to unclear ownership
+6. Story: Update onboarding docs - To Do
+

@@ -9,7 +9,11 @@ def route_request(user_input: str) -> tuple[str, str, str, str, str]:
     if tool_name != "none" and confidence == "high":
         for tool in TOOLS:
             if tool.name == tool_name:
-                tool_result = tool.func()
+                if tool.name == "backlog_analysis":
+                    with open("sample_backlog.txt", "r") as f:
+                        tool_result = tool.func(f.read())
+                else:
+                    tool_result = tool.func()
 
                 synthesis_prompt = f"""
 You are an assistant helping with Agile delivery, DevOps enablement, and platform engineering.
@@ -20,8 +24,15 @@ User question:
 Tool result:
 {tool_result}
 
-Use the tool result to produce a helpful final answer for the user.
-Do not mention that a tool was used.
+Write a final answer for the user based directly on the tool result.
+
+Requirements:
+- Use the specific counts from the tool result
+- Mention specific backlog items when relevant
+- Do not give only generic advice
+- Summarize the main risks found in this backlog
+- End with a short list of practical actions
+- Do not mention that a tool was used
 """
 
                 final_answer = ask_model(synthesis_prompt)

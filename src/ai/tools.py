@@ -55,24 +55,49 @@ Common warning signs include:
 A useful first response is to split large items, clarify priorities, reduce WIP, and make dependencies visible early.
 """
 
-def analyze_backlog_items():
-    return """
-Backlog risk analysis checklist:
+def analyze_backlog_items(backlog_text: str) -> str:
+    lines = [line.strip() for line in backlog_text.splitlines() if line.strip()]
 
-Look for:
-- items that are too large to complete within a sprint
-- unclear acceptance criteria
-- dependencies across teams
-- many items marked blocked
-- too many items in progress simultaneously
+    blocked_items = [line for line in lines if "blocked" in line.lower()]
+    in_progress_items = [line for line in lines if "in progress" in line.lower()]
+    large_items = [line for line in lines if "too large" in line.lower() or "spans multiple teams" in line.lower()]
+    unclear_items = [line for line in lines if "unclear" in line.lower()]
 
-Recommended actions:
-- split large items
-- clarify acceptance criteria
-- visualize dependencies
-- reduce WIP
-- ensure backlog prioritization is clear
-"""
+    results = []
+    results.append("Backlog analysis summary:")
+    results.append(f"- Total items: {len(lines)}")
+    results.append(f"- Blocked items: {len(blocked_items)}")
+    results.append(f"- In progress items: {len(in_progress_items)}")
+    results.append(f"- Large or cross-team items: {len(large_items)}")
+    results.append(f"- Unclear ownership or requirements items: {len(unclear_items)}")
+
+    if blocked_items:
+        results.append("")
+        results.append("Blocked items:")
+        for item in blocked_items:
+            results.append(f"- {item}")
+
+    if large_items:
+        results.append("")
+        results.append("Large or cross-team items:")
+        for item in large_items:
+            results.append(f"- {item}")
+
+    if unclear_items:
+        results.append("")
+        results.append("Items needing clarification:")
+        for item in unclear_items:
+            results.append(f"- {item}")
+
+    results.append("")
+    results.append("Recommended actions:")
+    results.append("- Reduce blocked work by resolving ownership and review delays")
+    results.append("- Split large items into smaller deliverables")
+    results.append("- Limit concurrent work in progress where possible")
+    results.append("- Clarify ownership and acceptance criteria early")
+
+    return "\n".join(results)
+
 
 
 
