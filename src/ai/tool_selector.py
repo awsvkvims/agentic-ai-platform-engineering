@@ -1,3 +1,4 @@
+import json
 from src.ai.client import ask_model
 from src.ai.tool_registry import get_tool_descriptions
 
@@ -14,14 +15,21 @@ Available tools:
 User request:
 {user_input}
 
-Return only one of these:
+Respond ONLY in JSON like this:
+
+{{"tool": "tool_name"}}
+
+Valid tool names:
 - kanban_metrics
 - platform_engineering
 - pi_planning_dependencies
 - none
-
-Do not explain your answer. Return only the tool name or none.
 """
 
     response = ask_model(prompt)
-    return response.strip().lower()
+
+    try:
+        data = json.loads(response)
+        return data.get("tool", "none")
+    except Exception:
+        return "none"
