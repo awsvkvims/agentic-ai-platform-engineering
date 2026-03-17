@@ -69,7 +69,6 @@ tool output, and final response -- making the agent's decisions
 fully auditable.
 
 ```
-
 ---
 
 ## Why This Architecture
@@ -109,7 +108,7 @@ Run the CLI:
     python -m scripts.agent_cli
 ```
 
-Run the evaluation suite:
+Run the evaluation suite: 
 
 ```code
     python -m scripts.eval_prompts

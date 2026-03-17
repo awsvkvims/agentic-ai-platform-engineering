@@ -8,6 +8,7 @@ from src.tools.agile_tools import (
 from src.tools.platform_tools import platform_engineering_tool
 from src.tools.terraform_analyzer import terraform_analyzer_tool
 from src.tools.ci_cd_tools import cicd_pipeline_reviewer_tool
+from src.tools.pr_tools import pr_infra_summarizer_tool
 
 TOOLS = [
     kanban_metrics_tool,
@@ -17,6 +18,7 @@ TOOLS = [
     backlog_analysis_tool,
     terraform_analyzer_tool,
     cicd_pipeline_reviewer_tool,
+    pr_infra_summarizer_tool,
 ]
 
 

@@ -3,6 +3,26 @@ You are a tool selector.
 Available tools:
 {tool_descriptions}
 
+Example tool usage
+
+User: What is lead time?
+Tool: kanban_metrics
+
+User: What are signs that a backlog has delivery risk?
+Tool: backlog_risk
+
+User: How should I analyze backlog items?
+Tool: backlog_analysis
+
+User: Analyze Terraform for security risks
+Tool: terraform_analyzer
+
+User: Review CI/CD pipeline for delivery risks
+Tool: cicd_pipeline_reviewer
+
+User: What is platform engineering?
+Tool: platform_engineering
+
 User request:
 {user_input}
 

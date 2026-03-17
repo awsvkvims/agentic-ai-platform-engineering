@@ -1,5 +1,6 @@
 from src.ai.langgraph_agent import run_langgraph_agent
 from src.ai.tool_registry import list_tools, get_tool_descriptions
+from src.ai.sample_registry import CLI_SAMPLE_COMMANDS, read_sample_file
 
 user_input = input("Enter your prompt: ")
 
@@ -33,27 +34,12 @@ elif user_input.lower() == "show tool descriptions":
     confidence = ""
     tool_result = ""
     response = get_tool_descriptions()
-elif user_input.lower() == "analyze backlog":
-    source = "local: backlog_file"
+elif user_input.lower() in CLI_SAMPLE_COMMANDS:
+    source = "local: sample_file"
     reason = ""
     confidence = ""
-    with open("samples/backlog/sample_backlog.txt", "r") as f:
-        tool_result = f.read()
-    response = tool_result
-elif user_input.lower() == "analyze terraform":
-    source = "local: terraform_file"
-    reason = ""
-    confidence = ""
-    with open("samples/terraform/sample_terraform.tf", "r") as f:
-        tool_result = f.read()
-    response = tool_result
-elif user_input.lower() == "analyze pipeline":
-    source = "local: pipeline_file"
-    reason = ""
-    confidence = ""
-    with open("samples/pipeline/sample_pipeline.yml", "r") as f:
-        tool_result = f.read()
-    response = tool_result
+    tool_result = ""
+    response = read_sample_file(CLI_SAMPLE_COMMANDS[user_input.lower()])
 else:
     source, reason, confidence, tool_result, response = run_langgraph_agent(user_input)
 
