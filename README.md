@@ -114,7 +114,6 @@ Run the evaluation suite:
 ```code
     python -m scripts.eval_prompts
 ```
-
 ---
 
 ## CLI Commands
