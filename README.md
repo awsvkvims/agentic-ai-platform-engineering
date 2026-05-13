@@ -1,236 +1,175 @@
-# Agentic AI for Platform Engineering Lab
+# Agentic AI for Platform Engineering
 
-Practical experiments exploring how agentic AI can support Agile delivery, DevOps enablement, and modern platform engineering teams.
+A working agent system that applies AI reasoning to real DevOps 
+and platform engineering workflows -- built to explore how 
+agentic AI can reduce manual toil for delivery, infrastructure, 
+and platform teams.
 
----
+Built with LangGraph, Python, and OpenAI. Transparent by design:
+every decision shows the selected tool, confidence level, and 
+reasoning path.
 
-# Overview
-
-This repository explores how agent-style AI systems can assist engineering organizations with real operational workflows.
-
-The focus is on practical scenarios across:
-
-- Agile and SAFe delivery
-- Kanban flow optimization
-- DevOps enablement
-- Infrastructure as Code (Terraform)
-- CI/CD automation
-- Developer platforms such as Backstage
-- Cloud governance, compliance, and FinOps
-
-Rather than building generic chatbots, the goal is to design assistive agents that can reason about engineering workflows and interact with tools and structured data.
-
-Examples explored in this repository include:
-
-- analyzing backlog risk and delivery bottlenecks
-- explaining Kanban flow metrics
-- guiding developers through platform engineering concepts
-- detecting delivery risks in backlog items
-- preparing the foundation for DevOps and platform agents
-
-The current implementation uses LangGraph to orchestrate a small agent workflow with tool selection, tool execution, and response synthesis.
+github.com/awsvkvims/agentic-ai-platform-engineering
 
 ---
 
-# Current Capabilities
+## What This Demonstrates
 
-The current implementation demonstrates a LangGraph-based agent workflow that can:
+This is not a chatbot or a tutorial. It is a working agent 
+system with deterministic tool execution, observable reasoning, 
+and a domain-specific tool registry covering the workflows 
+platform and DevOps teams deal with every day.
 
-- select tools using an LLM
-- execute deterministic tools
-- synthesize responses from tool results
-- analyze backlog data
-- analyze Terraform configuration risks
-- review CI/CD pipeline risks
-- provide CLI interaction with observable reasoning
+Specifically it demonstrates:
 
-Current examples include:
-
-- Kanban metric explanations
-- backlog risk detection
-- backlog analysis using sample backlog data
-- platform engineering explanations
-- PI planning dependency explanations
-- Terraform risk analysis
-- CI/CD pipeline review
-
-The system logs the reasoning path including:
-
-- selected tool
-- confidence level
-- reasoning explanation
-- tool output
-
-Logs are written to:
-
-`logs/interactions.log`
+- Agentic system design using LangGraph orchestration
+- Tool selection via structured LLM reasoning (tool + confidence 
+  + explanation)
+- Deterministic tool execution decoupled from LLM responses
+- Two-pass response synthesis (generation + refinement)
+- Observable decision paths logged per interaction
+- Domain tools covering Agile delivery, DevOps, IaC, and 
+  platform engineering
 
 ---
 
-# Sample Inputs
+## Agent Capabilities
 
-Sample inputs used by the agent are stored under:
+The agent can reason about and analyze:
 
-- `samples/backlog/sample_backlog.txt`
-- `samples/terraform/sample_terraform.tf`
-- `samples/pipeline/sample_pipeline.yml`
-
-These sample files make it easy to demonstrate the tools without needing external systems.
-
----
-
-# Architecture
-
-A high level overview of the architecture is available in:
-
-docs/architecture.md
-
-The current system follows a simple agent workflow.
-
-User
--> CLI
--> Tool Selector LLM
--> JSON tool decision
--> Router
--> Tool Registry
--> Tool Execution
--> Tool Result
--> Response Synthesis LLM
--> Final Response
-
-The architecture emphasizes:
-
-- transparent reasoning
-- deterministic tool execution
-- observable decision paths
-- simple extensibility
+| Domain | Capability |
+|---|---|
+| Agile & SAFe Delivery | Backlog risk detection, PI planning dependencies, Kanban flow metrics |
+| DevOps | CI/CD pipeline risk review, infrastructure PR summarization |
+| Infrastructure as Code | Terraform configuration risk analysis, security and best practice review |
+| Platform Engineering | Internal developer platform (IDP) guidance, Backstage workflow patterns |
+| FinOps & Governance | Foundation for compliance and cloud governance agents (roadmap) |
 
 ---
 
-# Quickstart
+## How the Agent Works
 
-Create and activate a virtual environment
+Every request follows this reasoning path:
 
+```text
+User Input
+  -> CLI
+  -> LangGraph Agent
+  -> Tool Selector LLM  (returns JSON: tool + reason + confidence)
+  -> Router
+      -> Tool Registry  (if high confidence tool match)
+      -> Fallback Model (if no strong match)
+  -> Tool Execution     (deterministic Python function)
+  -> Synthesis LLM      (first pass)
+  -> Refinement LLM     (second pass)
+  -> Final Response + Interaction Log
+
+Each interaction logs: selected tool, confidence, reasoning, 
+tool output, and final response -- making the agent's decisions 
+fully auditable.
+
+```
+
+---
+
+## Why This Architecture
+
+Three design principles drove every decision:
+
+**Transparent reasoning.** The agent explains why it selected 
+a tool and how confident it is. Black-box AI responses are not 
+acceptable in platform engineering contexts.
+
+**Deterministic tool execution.** Domain knowledge lives in 
+Python functions, not LLM prompts. This makes tools testable, 
+predictable, and independently improvable.
+
+**Simple extensibility.** Adding a new capability means adding 
+a tool to the registry and a sample input. The LangGraph 
+workflowdoes not change.
+
+---
+
+## Quickstart
+
+```code
     python3.13 -m venv venv
     source venv/bin/activate
-
-Install dependencies
-
     pip install openai python-dotenv pytest langgraph langchain-core
+```
+Create a .env file:
 
-Create a `.env` file in the project root
-
+```code
     OPENAI_API_KEY=your_api_key_here
+```
 
-Run the CLI
+Run the CLI:
 
-    python agent_cli.py
+```code
+    python -m scripts.agent_cli
+```
 
----
+Run the evaluation suite:
 
-# CLI Commands
-
-Inside the CLI you can run the following commands.
-
-- `help`
-- `list tools`
-- `show tool descriptions`
-- `analyze backlog`
-- `analyze terraform`
-- `analyze pipeline`
+```code
+    python -m scripts.eval_prompts
+```
 
 ---
 
-# Example Questions
+## CLI Commands
 
-Examples of questions you can ask the agent.
-
-- `What is lead time?`
-- `What are signs that a backlog may have delivery risk?`
-- `How should I analyze backlog items for delivery risk?`
-- `What is an internal developer platform?`
-- `Explain PI planning dependencies.`
-- `Analyze this Terraform for security and best practice risks`
-- `Review this CI/CD pipeline for delivery risks`
+    analyze backlog      -- detect delivery risk in backlog items
+    analyze terraform    -- review IaC for security and best practice risks
+    analyze pipeline     -- review CI/CD pipeline for delivery risks
+    analyze pr           -- summarize infrastructure pull request changes
+    list tools           -- show available tools
+    show tool descriptions
 
 ---
 
-# Evaluation Script
+## Repository Structure
 
-You can run a quick evaluation of routing behavior.
-
-    python eval_prompts.py
-
-This runs several prompts and prints:
-
-- selected tool
-- reasoning
-- confidence level
-- response
+    src/ai/        agent orchestration, LangGraph graph, prompt loading
+    src/tools/     deterministic domain tools
+    scripts/       CLI and evaluation entry points
+    samples/       sample backlog, Terraform, pipeline, and PR inputs
+    prompts/       tool selector and synthesis prompts (separate from code)
+    tests/         automated tests
+    logs/          interaction logs
+    docs/          architecture detail
 
 ---
 
-# Repository Goals
+## Roadmap
 
-This repository serves three purposes.
-
-- **Experimentation**: Exploring agent design patterns applicable to platform engineering and DevOps environments.
-
-- **Reference Implementations**: Providing small working examples of agent workflows that support delivery, infrastructure, and platform operations.
-
-- **Advisory Foundation**: Demonstrating approaches that can help organizations design an Agentic AI roadmap for platform engineering.
-
----
-
-# Project Roadmap
-
-The repository evolves incrementally.
-
-### Increment 1  
-Foundational agent architecture and tool system.
-
-### Increment 2  
-Model-driven tool selection, response synthesis, and backlog analysis.
-
-### Increment 3  
-LangGraph-based orchestration plus DevOps-oriented tools for Terraform and CI/CD analysis.
-
-### Increment 4  
-Platform engineering assistants inspired by Backstage workflows.
-
-### Increment 5  
-Compliance and FinOps governance agents.
+| Increment | Theme | Status |
+|---|---|---|
+| 1 | Foundational agent architecture and tool system | Done |
+| 2 | Model-driven tool selection, response synthesis, backlog analysis | Done |
+| 3 | LangGraph orchestration, Terraform, CI/CD, and PR tools | Done |
+| 4 | Platform engineering assistants, IDP and Backstage workflows | In Progress |
+| 5 | Compliance and FinOps governance agents | Planned |
 
 ---
 
-# Why Agentic AI for Platform Engineering
+## Context
 
-Platform teams already orchestrate complex systems such as:
+Platform engineering teams already orchestrate complex systems 
+-- infrastructure provisioning, CI/CD pipelines, developer 
+onboarding, governance, and delivery workflows.
 
-- infrastructure provisioning
-- CI/CD pipelines
-- developer onboarding
-- governance and compliance
-- delivery workflows
+This project explores how agentic AI can augment those systems 
+with context-aware reasoning -- reducing manual toil, improving 
+visibility, and accelerating engineering decisions.
 
-Agentic AI can augment these systems by providing context aware reasoning and workflow assistance.
-
-Potential benefits include:
-
-- reducing manual operational work
-- improving developer onboarding
-- accelerating delivery workflows
-- improving governance visibility
-- supporting engineering decision making
-
-The goal is assistive intelligence rather than autonomous systems.
-
-Agents should remain transparent, controllable, and safe.
+The goal is assistive intelligence, not autonomous action. 
+Agents should be transparent, controllable, and safe.
 
 ---
 
-# Collaboration
+## Discussion
 
-This repository is part of an ongoing exploration into how agentic AI can become a practical capability inside platform engineering teams.
-
-If you are exploring similar ideas or designing an Agentic AI roadmap for your platform organization, collaboration and discussion are welcome.
+If you are designing an Agentic AI roadmap for a platform 
+engineering or DevOps organization, collaboration and 
+discussion are welcome.
