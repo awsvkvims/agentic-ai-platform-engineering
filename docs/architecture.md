@@ -97,6 +97,68 @@ The graph structure allows additional nodes to be added easily as the system evo
 
 ---
 
+# LangGraph Sequence Diagram
+
+``` mermaid
+
+sequenceDiagram
+    participant U as User
+    participant CLI as scripts.agent_cli
+    participant LG as LangGraph
+    participant ST as select_tool node
+    participant LLM1 as Tool Selector LLM
+    participant RT as run_tool node
+    participant REG as Tool Registry
+    participant SAMPLES as Sample Registry
+    participant TOOL as Selected Tool(s)
+    participant SYN as synthesize node
+    participant LLM2 as Synthesis LLM
+    participant REF as Refinement LLM
+    participant LOG as logs/interactions.log
+
+    U->>CLI: Enter prompt
+    CLI->>LG: run_langgraph_agent(user_input)
+
+    LG->>ST: start state
+    ST->>LLM1: Choose up to 2 tools for this request
+    LLM1-->>ST: JSON {tools, reason, confidence}
+    ST-->>LG: state updated with selected_tools, reason, confidence
+
+    alt tools selected and confidence == high
+        loop for each selected tool
+            LG->>RT: run_tool node
+            RT->>REG: Find tool by name
+            REG-->>RT: Tool object
+            alt tool uses sample input
+                RT->>SAMPLES: Get sample path
+                SAMPLES-->>RT: Sample file path
+                RT->>TOOL: Call tool(sample_text)
+            else tool needs no sample
+                RT->>TOOL: Call tool()
+            end
+            TOOL-->>RT: tool_result
+            RT-->>LG: Append result to state.tool_result
+        end
+
+        LG->>SYN: synthesize node
+        SYN->>LLM2: Create first answer from tool_result
+        LLM2-->>SYN: first_pass answer
+        SYN->>REF: Refine answer for clarity/actionability
+        REF-->>SYN: final_answer
+        SYN-->>LG: state.final_answer, state.source
+    else no strong tool match
+        LG->>LLM2: Ask model directly
+        LLM2-->>LG: final_answer
+    end
+
+    LG-->>CLI: source, reason, confidence, tool_result, final_answer
+    CLI->>LOG: Write interaction details
+    CLI-->>U: Print source, confidence, reason, response
+    
+```
+
+---
+
 # Core Components
 
 ## CLI

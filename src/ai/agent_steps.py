@@ -1,13 +1,7 @@
-from src.ai.tool_selector import choose_tool
 from src.ai.tool_registry import TOOLS
 from src.ai.client import ask_model
 from src.ai.prompt_loader import load_prompt
 from src.ai.sample_registry import TOOL_SAMPLE_PATHS, read_sample_file
-
-
-def select_tool_step(user_input):
-    return choose_tool(user_input)
-
 
 def run_tool_step(tool_name):
     for tool in TOOLS:

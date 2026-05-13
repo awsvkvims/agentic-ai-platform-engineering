@@ -2,13 +2,15 @@ from typing import TypedDict
 
 from langgraph.graph import StateGraph, END
 
-from src.ai.agent_steps import select_tool_step, run_tool_step, synthesize_step
+from src.ai.agent_steps import run_tool_step, synthesize_step
+from src.ai.multi_tool_selector import choose_tools
 from src.ai.client import ask_model
 
 
 class AgentState(TypedDict):
     user_input: str
-    tool_name: str
+    selected_tools: list[str]
+    current_tool_index: int
     reason: str
     confidence: str
     tool_result: str
@@ -17,25 +19,58 @@ class AgentState(TypedDict):
 
 
 def select_tool_node(state: AgentState) -> AgentState:
-    tool_name, reason, confidence = select_tool_step(state["user_input"])
+    selected_tools, reason, confidence = choose_tools(state["user_input"])
 
-    state["tool_name"] = tool_name
+    # guardrails
+    if confidence != "high":
+        selected_tools = []
+
+    if len(selected_tools) > 2:
+        selected_tools = selected_tools[:2]
+
+    state["selected_tools"] = selected_tools
+    state["current_tool_index"] = 0
     state["reason"] = reason
     state["confidence"] = confidence
 
     return state
 
-
 def run_tool_node(state: AgentState) -> AgentState:
-    tool_result = run_tool_step(state["tool_name"])
-    state["tool_result"] = tool_result
+    if state["current_tool_index"] >= len(state["selected_tools"]):
+        return state
+
+    tool_info = state["selected_tools"][state["current_tool_index"]]
+    tool_name = tool_info["name"]
+    result = run_tool_step(tool_name)
+
+    if state["tool_result"]:
+        state["tool_result"] += "\n\n"
+    state["tool_result"] += f"[{tool_name}]\n{result}"
+
+    state["current_tool_index"] += 1
+
     return state
+
+def should_continue_tools(state: AgentState) -> str:
+    if state["current_tool_index"] < len(state["selected_tools"]):
+        return "more_tools"
+    return "synthesize"
 
 
 def synthesize_node(state: AgentState) -> AgentState:
-    final_answer = synthesize_step(state["user_input"], state["tool_result"])
+    first_pass = synthesize_step(state["user_input"], state["tool_result"])
+
+    refinement_prompt = (
+        "Refine the following answer to be clearer and more actionable:\n\n"
+        f"{first_pass}"
+    )
+
+    final_answer = ask_model(refinement_prompt)
+
+    selected_tools = [tool["name"] for tool in state["selected_tools"]]
     state["final_answer"] = final_answer
-    state["source"] = f'tool: {state["tool_name"]}'
+    state["source"] = f'tools: {", ".join(selected_tools)}'
+
     return state
 
 
@@ -48,10 +83,9 @@ def fallback_model_node(state: AgentState) -> AgentState:
 
 
 def should_use_tool(state: AgentState) -> str:
-    if state["tool_name"] != "none" and state["confidence"] == "high":
-        return "use_tool"
+    if state["selected_tools"] and state["confidence"] == "high":
+        return "use_tools"
     return "fallback"
-
 
 graph = StateGraph(AgentState)
 
@@ -66,12 +100,31 @@ graph.add_conditional_edges(
     "select_tool",
     should_use_tool,
     {
-        "use_tool": "run_tool",
+        "use_tools": "run_tool",
         "fallback": "fallback_model",
     },
 )
 
-graph.add_edge("run_tool", "synthesize")
+graph.set_entry_point("select_tool")
+
+graph.add_conditional_edges(
+    "select_tool",
+    lambda s: "use_tools" if s["selected_tools"] and s["confidence"] == "high" else "fallback",
+    {
+        "use_tools": "run_tool",
+        "fallback": "fallback_model",
+    },
+)
+
+graph.add_conditional_edges(
+    "run_tool",
+    should_continue_tools,
+    {
+        "more_tools": "run_tool",
+        "synthesize": "synthesize",
+    },
+)
+
 graph.add_edge("synthesize", END)
 graph.add_edge("fallback_model", END)
 
@@ -81,8 +134,9 @@ agent_graph = graph.compile()
 def run_langgraph_agent(user_input: str) -> tuple[str, str, str, str, str]:
     result = agent_graph.invoke(
         {
-            "user_input": user_input,
-            "tool_name": "",
+           "user_input": user_input,
+            "tselected_tools": [],
+            "current_tool_index": 0,
             "reason": "",
             "confidence": "",
             "tool_result": "",
@@ -92,11 +146,12 @@ def run_langgraph_agent(user_input: str) -> tuple[str, str, str, str, str]:
     )
 
     return (
-        result["source"],
-        result["reason"],
-        result["confidence"],
-        result["tool_result"],
-        result["final_answer"],
+        result.get("source", ""),
+        result.get("reason", ""),
+        result.get("confidence", ""),
+        result.get("tool_result", ""),
+        result.get("final_answer", ""),
+        result.get("selected_tools", []),  # this is your list of dicts
     )
     
 def get_graph():
