@@ -2,6 +2,7 @@ from src.ai.tool_definition import Tool
 
 
 def summarize_pr_diff(diff_text: str) -> str:
+    """Identify infrastructure resource changes and security risks in a Terraform PR diff."""
     text = diff_text.lower()
 
     findings = []

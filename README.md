@@ -42,7 +42,7 @@ The agent can reason about and analyze:
 | Agile & SAFe Delivery | Backlog risk detection, PI planning dependencies, Kanban flow metrics |
 | DevOps | CI/CD pipeline risk review, infrastructure PR summarization |
 | Infrastructure as Code | Terraform configuration risk analysis, security and best practice review |
-| Platform Engineering | Internal developer platform (IDP) guidance, Backstage workflow patterns |
+| Platform Engineering | Internal developer platform (IDP) guidance |
 | FinOps & Governance | Foundation for compliance and cloud governance agents (roadmap) |
 
 ---

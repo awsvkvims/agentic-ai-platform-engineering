@@ -2,6 +2,7 @@
 from src.ai.tool_definition import Tool
 
 def explain_platform_engineering():
+	"""Return a definition of platform engineering and the capabilities an internal developer platform typically provides."""
 	return """
 Platform engineering is the practice of building and operating internal developer platforms that help teams deliver software more safely, quickly, and consistently.
 

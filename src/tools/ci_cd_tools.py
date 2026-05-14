@@ -2,6 +2,7 @@ from src.ai.tool_definition import Tool
 
 
 def review_cicd_pipeline(pipeline_text: str) -> str:
+    """Scan CI/CD pipeline configuration text for missing test, security scan, and rollback stages."""
     findings = []
 
     text = pipeline_text.lower()

@@ -231,13 +231,16 @@ This allows the selector to reason about available capabilities.
 
 Tools are deterministic Python functions that provide domain specific capabilities.
 
-Current examples include:
+Current tools include:
 
 - Kanban metric explanations
-- backlog risk analysis
-- backlog analysis using structured backlog data
-- platform engineering explanations
+- Backlog risk analysis
+- Backlog analysis using structured backlog data
+- Platform engineering explanations
 - PI planning dependency explanations
+- Terraform configuration risk analysis (security and best practice)
+- CI/CD pipeline risk review (test, security scan, and rollback stages)
+- Infrastructure PR diff summarization (resource changes and security risks)
 
 Tools allow the agent to access structured knowledge rather than relying only on LLM responses.
 
@@ -276,8 +279,6 @@ This provides transparency into how the agent made decisions.
 The architecture will evolve in later stages of the project.
 
 Planned improvements include:
-
-DevOps oriented tools for Terraform and CI/CD analysis
 
 Platform engineering assistants for developer onboarding
 

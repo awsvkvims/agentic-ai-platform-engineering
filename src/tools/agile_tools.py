@@ -1,6 +1,7 @@
 from src.ai.tool_definition import Tool
 
 def explain_kanban_metrics():
+    """Return definitions and descriptions of key Kanban flow metrics."""
     return """
 Key Kanban flow metrics:
 
@@ -20,6 +21,7 @@ These metrics help teams understand flow efficiency and identify bottlenecks.
 """
 
 def explain_pi_planning_dependencies():
+    """Explain SAFe PI Planning dependency types and why managing them reduces delivery risk."""
     return """
 In SAFe PI Planning, dependencies are relationships where one team or work item relies on another team to deliver something first or in coordination.
 
@@ -32,6 +34,7 @@ Common dependency types include:
 Managing dependencies well helps reduce delivery risk, improve coordination, and expose blockers early during PI execution.
 """
 def summarize_backlog_risk():
+    """Return common warning signs of an unhealthy backlog and recommended remediation actions."""
     return """
 A backlog may show delivery risk when it contains too many large items, unclear priorities, unresolved dependencies, blocked work, or too much work in progress at the same time.
 
@@ -46,6 +49,7 @@ A useful first response is to split large items, clarify priorities, reduce WIP,
 """
 
 def analyze_backlog_items(backlog_text: str) -> str:
+    """Parse raw backlog text and count blocked, in-progress, large, and unclear items."""
     lines = [line.strip() for line in backlog_text.splitlines() if line.strip()]
 
     blocked_items = [line for line in lines if "blocked" in line.lower()]

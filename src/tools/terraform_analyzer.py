@@ -1,6 +1,7 @@
 from src.ai.tool_definition import Tool
 
 def analyze_terraform(tf_text: str) -> str:
+    """Detect security and best-practice risks in Terraform configuration text."""
     findings = []
 
     if "0.0.0.0/0" in tf_text:
