@@ -39,6 +39,7 @@ elif user_input.lower() in CLI_SAMPLE_COMMANDS:
     reason = ""
     confidence = ""
     tool_result = ""
+    selected_tools = []
     response = read_sample_file(CLI_SAMPLE_COMMANDS[user_input.lower()])
 else:
     source, reason, confidence, tool_result, response, selected_tools = run_langgraph_agent(user_input)
